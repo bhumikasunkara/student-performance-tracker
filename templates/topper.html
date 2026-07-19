@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Subject Topper</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🏆 Subject-Wise Topper</h1>
+
+    <form method="POST">
+
+        <input
+            type="text"
+            name="subject"
+            placeholder="Enter Subject Name"
+            required
+        >
+
+        <br><br>
+
+        <button type="submit">
+            Find Topper
+        </button>
+
+    </form>
+
+    {% if topper %}
+
+        <h2>🏆 Topper Details</h2>
+
+        <p><b>Roll No:</b> {{ topper[0] }}</p>
+
+        <p><b>Name:</b> {{ topper[1] }}</p>
+
+        <p><b>Subject:</b> {{ topper[2] }}</p>
+
+        <p><b>Marks:</b> {{ topper[3] }}</p>
+
+    {% endif %}
+
+    <br><br>
+
+    <a href="/">
+        <button>🏠 Back to Home</button>
+    </a>
+
+</div>
+
+</body>
+</html>

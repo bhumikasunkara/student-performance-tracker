@@ -1,0 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#2f80ed,#2dc7f3);
+    padding:30px;
+}
+
+.container{
+    width:900px;
+    background:#fff;
+    border-radius:25px;
+    padding:30px;
+    text-align:center;
+    box-shadow:0 15px 40px rgba(0,0,0,.25);
+}
+
+.logo{
+    font-size:50px;
+    color:#1e3a8a;
+    margin-bottom:15px;
+}
+
+h1{
+    font-size:40px;
+    color:#1f2d5a;
+    margin-bottom:15px;
+}
+
+.line{
+    width:220px;
+    height:3px;
+    background:#2f80ed;
+    margin:20px auto;
+    border-radius:5px;
+}
+
+.student-box{
+    display:inline-flex;
+    align-items:center;
+    gap:15px;
+    background:#eef5ff;
+    padding:12px 25px;
+    border-radius:15px;
+    font-size:22px;
+    font-weight:bold;
+    color:#1f2d5a;
+    margin-bottom:20px;
+}
+
+.student-box i{
+    color:#2563eb;
+}
+
+.container p{
+    font-size:18px;
+    color:#666;
+    margin-bottom:40px;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:25px;
+}
+
+.card{
+    text-decoration:none;
+    background:white;
+    border-radius:18px;
+    padding:25px 15px;
+    box-shadow:0 8px 20px rgba(0,0,0,.12);
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-8px);
+}
+
+.card i{
+    font-size:50px;
+    margin-bottom:20px;
+}
+
+.card h2{
+    font-size:22px;
+    margin-bottom:15px;
+}
+
+.card p{
+    font-size:15px;
+    margin:0;
+}
+
+.green{
+    border-bottom:5px solid #22c55e;
+}
+.green i,.green h2{
+    color:#22c55e;
+}
+
+.blue{
+    border-bottom:5px solid #2563eb;
+}
+.blue i,.blue h2{
+    color:#2563eb;
+}
+
+.purple{
+    border-bottom:5px solid #7c3aed;
+}
+.purple i,.purple h2{
+    color:#7c3aed;
+}
+
+.orange{
+    border-bottom:5px solid orange;
+}
+.orange i,.orange h2{
+    color:orange;
+}
+
+.pink{
+    border-bottom:5px solid #ec4899;
+}
+.pink i,.pink h2{
+    color:#ec4899;
+}
+
+.cards .card:nth-child(4){
+    grid-column:1/2;
+    margin-left:100px;
+}
+
+.cards .card:nth-child(5){
+    grid-column:2/3;
+    margin-right:100px;
+}
+
+.success-message{
+    background:#d4edda;
+    color:#155724;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:25px;
+    font-size:18px;
+    font-weight:bold;
+}
+
+hr{
+    margin:40px 0 20px;
+}
+
+footer{
+    font-size:24px;
+    color:#666;
+}
+
+footer b{
+    color:#1f2d5a;
+}
+
+.gold{
+    border-bottom:5px solid #f59e0b;
+}
+
+.gold i,
+.gold h2{
+    color:#f59e0b;
+}
+
+.cyan{
+    border-bottom:5px solid #06b6d4;
+}
+
+.cyan i,
+.cyan h2{
+    color:#06b6d4;
+}

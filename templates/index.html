@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Tracker</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success-message">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <i class="fa-solid fa-graduation-cap logo"></i>
+
+    <h1>Student Performance Tracker</h1>
+
+    <div class="line"></div>
+
+    <div class="student-box">
+        <i class="fa-solid fa-users"></i>
+        <span>Total Students: {{ total_students }}</span>
+    </div>
+
+    <p>Manage Student Records Easily</p>
+
+    <div class="cards">
+
+        <a href="/add_student" class="card green">
+            <i class="fa-solid fa-user-plus"></i>
+            <h2>Add Student</h2>
+            <p>Add new student records</p>
+        </a>
+
+        <a href="/add_grades" class="card blue">
+            <i class="fa-solid fa-book"></i>
+            <h2>Add Grades</h2>
+            <p>Add grades for students</p>
+        </a>
+
+        <a href="/students" class="card purple">
+            <i class="fa-solid fa-users"></i>
+            <h2>View Students</h2>
+            <p>View all student records</p>
+        </a>
+
+        <a href="/average" class="card orange">
+            <i class="fa-solid fa-chart-column"></i>
+            <h2>Average Report</h2>
+            <p>View average performance report</p>
+        </a>
+
+        <a href="/search_student" class="card pink">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <h2>Search Student</h2>
+            <p>Search student by Roll Number</p>
+        </a>
+
+        <a href="/topper" class="card gold">
+           <i class="fa-solid fa-trophy"></i>
+           <h2>Subject Topper</h2>
+           <p>Find the topper in a subject</p>
+        </a>
+
+        <a href="/class_average" class="card cyan">
+            <i class="fa-solid fa-calculator"></i>
+            <h2>Class Average</h2>
+            <p>Calculate subject average</p>
+        </a>
+
+    </div>
+
+    <hr>
+
+    <footer>
+        <i class="fa-solid fa-graduation-cap"></i>
+        Developed by <b>Bhumika</b> ❤️
+    </footer>
+
+</div>
+
+</body>
+</html>
