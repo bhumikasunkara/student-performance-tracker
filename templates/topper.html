@@ -26,6 +26,10 @@
         </button>
 
     </form>
+     
+    {% if message %}
+    <p class="error">{{ message }}</p>
+    {% endif %}
 
     {% if topper %}
 

@@ -209,3 +209,11 @@ button:hover,
 input[type="submit"]:hover {
     background-color: #45a049;
 }
+
+.error {
+    color: red;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+}

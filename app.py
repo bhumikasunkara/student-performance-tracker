@@ -177,6 +177,7 @@ def search_student():
 def topper():
 
     topper = None
+    message = None
 
     if request.method == "POST":
 
@@ -200,9 +201,12 @@ def topper():
 
         topper = cursor.fetchone()
 
+        if topper is None:
+            message = "❌ Subject not found"
+
         conn.close()
 
-    return render_template("topper.html", topper=topper)
+    return render_template("topper.html", topper=topper, message=message)
 
 @app.route("/class_average", methods=["GET", "POST"])
 def class_average():
