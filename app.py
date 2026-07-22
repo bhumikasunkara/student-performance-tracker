@@ -134,7 +134,7 @@ def average():
         conn = sqlite3.connect("students.db")
         cursor = conn.cursor()
 
-         cursor.execute("""
+        cursor.execute("""
             SELECT AVG(grades.marks)
             FROM students
             JOIN grades
@@ -144,9 +144,10 @@ def average():
 
         avg = cursor.fetchone()
 
-        if avg is None:
+        if avg[0] is None:
             message = "❌ Class not found"
-
+        else:
+            avg=avg[0]
         conn.close()
 
     return render_template("average.html", avg=avg, message=message)
