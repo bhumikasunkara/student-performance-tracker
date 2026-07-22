@@ -134,7 +134,13 @@ def average():
         conn = sqlite3.connect("students.db")
         cursor = conn.cursor()
 
-        # your existing query here
+         cursor.execute("""
+            SELECT AVG(grades.marks)
+            FROM students
+            JOIN grades
+            ON students.roll_no = grades.roll_no
+            WHERE students.class = ?
+        """, (class_name,))
 
         avg = cursor.fetchone()
 
