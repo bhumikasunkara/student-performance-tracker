@@ -121,28 +121,29 @@ def students():
 # -------------------------------
 # Average Report
 # -------------------------------
-@app.route("/average")
+@app.route("/average", methods=["GET", "POST"])
 def average():
 
-    conn = sqlite3.connect("students.db")
-    cursor = conn.cursor()
+    avg = None
+    message = None
 
-    cursor.execute("""
-        SELECT students.roll_no,
-           students.name,
-           ROUND(AVG(grades.marks), 2)
-        FROM students
-        JOIN grades
-        ON students.roll_no = grades.roll_no
-        GROUP BY students.roll_no, students.name
-        ORDER BY CAST(students.roll_no AS INTEGER) ASC
-    """)
+    if request.method == "POST":
 
-    averages = cursor.fetchall()
+        class_name = request.form["class"]
 
-    conn.close()
+        conn = sqlite3.connect("students.db")
+        cursor = conn.cursor()
 
-    return render_template("average.html", averages=averages)
+        # your existing query here
+
+        avg = cursor.fetchone()
+
+        if avg is None:
+            message = "❌ Class not found"
+
+        conn.close()
+
+    return render_template("average.html", avg=avg, message=message)
 
 @app.route("/search_student", methods=["GET", "POST"])
 def search_student():

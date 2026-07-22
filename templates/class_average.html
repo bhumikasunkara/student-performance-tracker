@@ -27,6 +27,10 @@
 
     </form>
 
+    {% if message %}
+    <p class="error">{{ message }}</p>
+    {% endif %}
+
     {% if average is not none %}
 
         <h2>📊 Average Marks</h2>
