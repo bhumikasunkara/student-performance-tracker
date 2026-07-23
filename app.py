@@ -126,32 +126,36 @@ def average():
 
     avg = None
     message = None
+    subject = None
 
     if request.method == "POST":
 
-        class_name = request.form["class"]
+        subject = request.form["subject"]
 
         conn = sqlite3.connect("students.db")
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT AVG(grades.marks)
-            FROM students
-            JOIN grades
-            ON students.roll_no = grades.roll_no
-            WHERE students.class = ?
-        """, (class_name,))
+            SELECT AVG(marks)
+            FROM grades
+            WHERE subject = ?
+        """, (subject,))
 
         avg = cursor.fetchone()
 
         if avg[0] is None:
-            message = "❌ Class not found"
+            message = "❌ Subject not found"
         else:
-            avg=avg[0]
+            avg = round(avg[0], 2)
+
         conn.close()
 
-    return render_template("average.html", avg=avg, message=message)
-
+    return render_template(
+        "average.html",
+        avg=avg,
+        subject=subject,
+        message=message
+    )
 @app.route("/search_student", methods=["GET", "POST"])
 def search_student():
 
@@ -216,11 +220,12 @@ def topper():
 
     return render_template("topper.html", topper=topper, message=message)
 
-@app.route("/class_average", methods=["GET", "POST"])
-def class_average():
+@app.route("/average", methods=["GET", "POST"])
+def average():
 
-    average = None
-    subject = ""
+    avg = None
+    message = None
+    subject = None
 
     if request.method == "POST":
 
@@ -229,24 +234,27 @@ def class_average():
         conn = sqlite3.connect("students.db")
         cursor = conn.cursor()
 
-        cursor.execute(
-            "SELECT AVG(marks) FROM grades WHERE subject = ?",
-            (subject,)
-        )
+        cursor.execute("""
+            SELECT AVG(marks)
+            FROM grades
+            WHERE subject = ?
+        """, (subject,))
 
-        result = cursor.fetchone()
+        avg = cursor.fetchone()
 
-        if result and result[0] is not None:
-            average = round(result[0], 2)
+        if avg[0] is None:
+            message = "❌ Subject not found"
+        else:
+            avg = round(avg[0], 2)
 
         conn.close()
 
     return render_template(
-        "class_average.html",
-        average=average,
-        subject=subject
+        "average.html",
+        avg=avg,
+        subject=subject,
+        message=message
     )
-
 # -------------------------------
 # Run Flask
 # -------------------------------
