@@ -220,41 +220,7 @@ def topper():
 
     return render_template("topper.html", topper=topper, message=message)
 
-@app.route("/average", methods=["GET", "POST"])
-def average():
 
-    avg = None
-    message = None
-    subject = None
-
-    if request.method == "POST":
-
-        subject = request.form["subject"]
-
-        conn = sqlite3.connect("students.db")
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            SELECT AVG(marks)
-            FROM grades
-            WHERE subject = ?
-        """, (subject,))
-
-        avg = cursor.fetchone()
-
-        if avg[0] is None:
-            message = "❌ Subject not found"
-        else:
-            avg = round(avg[0], 2)
-
-        conn.close()
-
-    return render_template(
-        "average.html",
-        avg=avg,
-        subject=subject,
-        message=message
-    )
 # -------------------------------
 # Run Flask
 # -------------------------------
