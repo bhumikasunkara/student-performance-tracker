@@ -132,7 +132,7 @@ def average():
     if request.method == "POST":
 
         subject = request.form.get("subject")
-         if not subject:
+        if not subject:
             message = "Please enter subject"
             return render_template(
                 "average.html",
