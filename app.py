@@ -121,35 +121,39 @@ def students():
 # -------------------------------
 # Average Report
 # -------------------------------
-# -------------------------------
-# Class Average Report
-# -------------------------------
+
 @app.route("/average", methods=["GET", "POST"])
 def average():
 
     avg = None
     message = None
-    class_name = None
+    subject = None
 
     if request.method == "POST":
 
-        class_name = request.form["class"]
+        subject = request.form.get("subject")
+         if not subject:
+            message = "Please enter subject"
+            return render_template(
+                "average.html",
+                avg=avg,
+                subject=subject,
+                message=message
+            )
 
         conn = sqlite3.connect("students.db")
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT AVG(grades.marks)
-            FROM students
-            JOIN grades
-            ON students.roll_no = grades.roll_no
-            WHERE students.class = ?
-        """, (class_name,))
+            SELECT AVG(marks)
+            FROM grades
+            WHERE subject = ?
+        """, (subject,))
 
         avg = cursor.fetchone()
 
         if avg[0] is None:
-            message = "❌ Class not found"
+            message = "❌ Subject not found"
         else:
             avg = round(avg[0], 2)
 
@@ -158,10 +162,9 @@ def average():
     return render_template(
         "average.html",
         avg=avg,
-        class_name=class_name,
+        subject=subject,
         message=message
     )
-
 
 @app.route("/search_student", methods=["GET", "POST"])
 def search_student():
