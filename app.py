@@ -1,8 +1,51 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-import sqlite3
+import psycopg2
+import os
 
 app = Flask(__name__)
 app.secret_key = "student_tracker"
+
+
+# -------------------------------
+# Database Connection
+# -------------------------------
+def get_db_connection():
+    database_url = os.environ.get("DATABASE_URL")
+
+    if not database_url:
+        raise Exception("DATABASE_URL is not configured")
+
+    conn = psycopg2.connect(database_url)
+    return conn
+
+
+# -------------------------------
+# Initialize Database
+# -------------------------------
+def init_db():
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS students (
+            roll_no VARCHAR(50) PRIMARY KEY,
+            name VARCHAR(100) NOT NULL
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS grades (
+            id SERIAL PRIMARY KEY,
+            roll_no VARCHAR(50) NOT NULL,
+            subject VARCHAR(100) NOT NULL,
+            marks NUMERIC NOT NULL
+        )
+    """)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
 
 
 # -------------------------------
@@ -11,19 +54,19 @@ app.secret_key = "student_tracker"
 @app.route("/")
 def home():
 
-    conn = sqlite3.connect("students.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT COUNT(*) FROM students")
     total_students = cursor.fetchone()[0]
 
+    cursor.close()
     conn.close()
 
     return render_template(
         "index.html",
         total_students=total_students
     )
-    
 
 
 # -------------------------------
@@ -37,27 +80,37 @@ def add_student():
         name = request.form["name"]
         roll = request.form["roll"]
 
+        conn = None
+        cursor = None
+
         try:
-            conn = sqlite3.connect("students.db")
+            conn = get_db_connection()
             cursor = conn.cursor()
 
             cursor.execute(
-                "INSERT INTO students (roll_no, name) VALUES (?, ?)",
+                "INSERT INTO students (roll_no, name) VALUES (%s, %s)",
                 (roll, name)
             )
 
             conn.commit()
 
-        except sqlite3.IntegrityError:
-            conn.close()
+        except psycopg2.IntegrityError:
+            if conn:
+                conn.rollback()
+
             return "❌ Roll Number already exists!"
 
         finally:
-            conn.close()
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
 
         flash("✅ Student added successfully!")
         return redirect(url_for("home"))
+
     return render_template("add_student.html")
+
 
 # -------------------------------
 # Add Grades
@@ -71,31 +124,39 @@ def add_grades():
         subject = request.form["subject"]
         marks = request.form["marks"]
 
-        conn = sqlite3.connect("students.db")
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT * FROM students WHERE roll_no = ?",
+            "SELECT * FROM students WHERE roll_no = %s",
             (roll,)
         )
 
         student = cursor.fetchone()
 
         if student is None:
-           conn.close()
-           return "❌ Student not found! Please add the student first."
+            cursor.close()
+            conn.close()
+            return "❌ Student not found! Please add the student first."
 
         cursor.execute(
-            "INSERT INTO grades (roll_no, subject, marks) VALUES (?, ?, ?)",
+            """
+            INSERT INTO grades (roll_no, subject, marks)
+            VALUES (%s, %s, %s)
+            """,
             (roll, subject, marks)
         )
 
         conn.commit()
+
+        cursor.close()
         conn.close()
 
         flash("✅ Grades added successfully!")
         return redirect(url_for("home"))
+
     return render_template("add_grades.html")
+
 
 # -------------------------------
 # View Students
@@ -103,25 +164,29 @@ def add_grades():
 @app.route("/students")
 def students():
 
-    conn = sqlite3.connect("students.db")
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-            SELECT roll_no, name
-            FROM students
-            ORDER BY CAST(roll_no AS INTEGER) ASC
+        SELECT roll_no, name
+        FROM students
+        ORDER BY CAST(roll_no AS INTEGER) ASC
     """)
 
     students = cursor.fetchall()
 
+    cursor.close()
     conn.close()
 
-    return render_template("students.html", students=students)
+    return render_template(
+        "students.html",
+        students=students
+    )
+
 
 # -------------------------------
 # Average Report
 # -------------------------------
-
 @app.route("/average", methods=["GET", "POST"])
 def average():
 
@@ -132,8 +197,10 @@ def average():
     if request.method == "POST":
 
         subject = request.form.get("subject")
+
         if not subject:
             message = "Please enter subject"
+
             return render_template(
                 "average.html",
                 avg=avg,
@@ -141,13 +208,13 @@ def average():
                 message=message
             )
 
-        conn = sqlite3.connect("students.db")
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute("""
             SELECT AVG(marks)
             FROM grades
-            WHERE subject = ?
+            WHERE subject = %s
         """, (subject,))
 
         avg = cursor.fetchone()
@@ -155,8 +222,9 @@ def average():
         if avg[0] is None:
             message = "❌ Subject not found"
         else:
-            avg = round(avg[0], 2)
+            avg = round(float(avg[0]), 2)
 
+        cursor.close()
         conn.close()
 
     return render_template(
@@ -166,6 +234,10 @@ def average():
         message=message
     )
 
+
+# -------------------------------
+# Search Student
+# -------------------------------
 @app.route("/search_student", methods=["GET", "POST"])
 def search_student():
 
@@ -177,16 +249,21 @@ def search_student():
         searched = True
         roll = request.form["roll"]
 
-        conn = sqlite3.connect("students.db")
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT roll_no, name FROM students WHERE roll_no = ?",
+            """
+            SELECT roll_no, name
+            FROM students
+            WHERE roll_no = %s
+            """,
             (roll,)
         )
 
         student = cursor.fetchone()
 
+        cursor.close()
         conn.close()
 
     return render_template(
@@ -195,6 +272,10 @@ def search_student():
         searched=searched
     )
 
+
+# -------------------------------
+# Subject Topper
+# -------------------------------
 @app.route("/topper", methods=["GET", "POST"])
 def topper():
 
@@ -205,7 +286,7 @@ def topper():
 
         subject = request.form["subject"]
 
-        conn = sqlite3.connect("students.db")
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -216,7 +297,7 @@ def topper():
             FROM students
             JOIN grades
             ON students.roll_no = grades.roll_no
-            WHERE grades.subject = ?
+            WHERE grades.subject = %s
             ORDER BY grades.marks DESC
             LIMIT 1
         """, (subject,))
@@ -226,13 +307,21 @@ def topper():
         if topper is None:
             message = "❌ Subject not found"
 
+        cursor.close()
         conn.close()
 
-    return render_template("topper.html", topper=topper, message=message)
+    return render_template(
+        "topper.html",
+        topper=topper,
+        message=message
+    )
 
 
 # -------------------------------
-# Run Flask
+# Initialize Database
 # -------------------------------
 if __name__ == "__main__":
+    init_db()
     app.run(debug=True)
+else:
+    init_db()
